@@ -1,0 +1,208 @@
+---
+title: "Juliette HW 1"
+author: "Juliette J. Rubin"
+date: "January 23, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+library("knitr")
+library("bookdown")
+library("knitcitations")
+
+knitr::opts_chunk$set(echo = TRUE)
+## Text results
+opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, include = TRUE)
+
+## Code decoration
+opts_chunk$set(tidy = TRUE, tidy.opts = list(blank = TRUE, width.cutoff = 80), highlight = TRUE)
+
+## Plots
+opts_chunk$set(fig.path = "figures/", dev=c('pdf', 'png'), dpi = 300)
+```
+
+## Question 1
+Math scores and LSD
+
+```{r math, results='asis'}
+
+math<-read.csv("math_scores.csv")
+model1<-lm(math$MATH_score~math$LSD_concentration)
+coef(model1)
+confint(model1)
+
+#model fit with the given functions
+yhat<-89.12+(-9.009)*math$LSD_concentration
+y<- math$MATH_score
+
+r2<-function(y_hat,y) {
+    RSS<-sum((((y_hat))-(y))^2)
+    TSS<-sum(((y)-(mean(y)))^2)
+    return(1-RSS/TSS)}
+
+r2(yhat,y)
+
+#result: 0.878
+
+rmse=function(y_hat,y) { 
+  return(sqrt(mean((y-y_hat)^2))) 
+}
+rmse(yhat,y)
+
+#result: 6.02
+```
+We find that the equation of this line is comprised of the following values: Intercept = 89.12, Slope=-9.009 and the metric of model fit as determined by our functions above is R^2=0.878. Additionally, our confidence interval output indicates that there is a sig effect of LSD concentration on math scores, as 95% of the time we are going to get an effect of LSD on math scores.
+
+1B) Although our math score data seems to be tightly associated with LSD intake (r2: 0.878), we can't say much about its predictive qualities because r^2 says little about prediction error, and thus we could be wrong
+
+1C) The normal distribution might not be acceptable for these data because grades do not go to positive and negative infinity. There are set bookends.
+
+```{r equation 1A}
+
+#y=mx+b
+(85-89.12)/-9.009
+
+#result = 0.46 LSD concentration
+
+```
+
+### Math score plot
+
+
+```{r mathplot, echo=TRUE}
+
+plot(math$MATH_score~math$LSD_concentration)
+curve(89.12+(-9.009)*x, add=T, col="blue")
+
+```
+
+##Question 2 
+
+Pomegranate miracle food
+
+```{r pomegranate}
+
+miracle<-read.csv("miracle_food.csv")
+model2<- lm(miracle$Weight_loss~miracle$pomegranate)
+coef(model2)
+confint(model2)
+
+yhat<--0.179+(-0.525)*miracle$pomegranate
+y<-miracle$Weight_loss
+
+r2<-function(y_hat,y) {
+    RSS<-sum((((y_hat))-(y))^2)
+    TSS<-sum(((y)-(mean(y)))^2)
+    return(1-RSS/TSS)}
+
+r2(yhat,y)
+
+#r^2 = 0.008
+
+rmse=function(y_hat,y) { 
+  return(sqrt(mean((y-y_hat)^2))) 
+}
+rmse(yhat,y)
+
+#result:9.96
+
+```
+
+We find that the equation of this line is comprised of the following values: intercept=-0.179, slope=-0.525. Our confidence intervals do not indicate that this is a significant effect and our r^2 value is quite low, meaning that our model is worse than just assessing mean weight loss. I therefore cannot agree with the farmer's claim (though I don't dismiss its efficacy as an ad campaign).
+
+
+```{r pom plot}
+
+plot(miracle$Weight_loss~miracle$pomegranate)
+curve(-0.179+(-0.525*x),add=T, col="red")
+
+```
+
+
+
+##Question 3
+
+```{r MAE}
+
+#MAE of math data
+yhat<-89.12+-9.009*math$LSD_concentration
+y<- math$MATH_score
+
+MAE<-function(yhat,y){
+  return(mean(abs(y-yhat)))
+}
+
+MAE(yhat,y)
+
+#result: 4.89
+
+
+#MAE of pomegranate data
+yhat<--0.179+-0.525*miracle$pomegranate
+y<- miracle$Weight_loss
+
+MAE<-function(yhat,y){
+  return(mean(abs(y-yhat)))
+}
+
+MAE(yhat,y)
+
+#result: 7.98
+
+```
+Comparing the measures of model fit for math score data:
+r^2: 0.88
+RMSE:6.02
+MAE: 4.89
+
+These measures provide quite different results in terms of our model fit. It seems like r^2 might make it appear as though LSD concentration is a better predictor of math scores than it actually is.
+
+Comparing the measures of model fit for pomegranate data:
+r^2: 0.008
+RMSE: 9.96
+MAE: 7.98
+
+Here, our r^2 value demonstrates that there is only a weak association (if any) between pomegranate eating and weight loss. Similarly, our RMSE and MAE values seem to indicate quite a weak model. 
+
+
+##Question 4
+
+```{r pubs}
+
+days_skiing<-runif(100)
+slope<--0.4
+intercept<-2
+sigma<-0.8
+publications<- rnorm(n=100, mean= intercept + slope*days_skiing, sd=0.8)
+publications
+
+model3<- lm(publications~days_skiing)
+coef(model3)
+confint(model3)
+
+plot(publications~days_skiing)
+curve(1.834+(-0.26*x),add=T, col="green")
+
+
+```
+
+
+When trying to assess how the number of days a person goes skiing in a year affects the number of publications the person submits that year, we find that the equations of the line is y=-0.26*days-skiing + 1.834. This is different from the true values that I came up with, presumably due to the variance introduced into this dataset with a sd of 0.8
+
+
+##Question 5
+
+```{r equation}
+
+congress_days<-runif(100)
+slope<-0.7
+intercept<-10
+sigma<-.5*congress_days
+bills_passed<- rnorm(n=100, mean= intercept + slope*congress_days, sd=sigma)
+
+plot(bills_passed~congress_days)
+```
+
+This would indicate that the more days congress spends in session the more variable it becomes whether they do their jobs and pass legislature (let alone what the content of those bills are), or whether the environment becomes too acerbic to get anything done.
+
